@@ -64,6 +64,7 @@ let ddVersion = null;
 async function getDdVersion() {
   if (ddVersion) return ddVersion;
   const res = await fetch('https://ddragon.leagueoflegends.com/api/versions.json');
+  if (!res.ok) throw new Error(`DDragon versions fetch failed: ${res.status}`);
   const versions = await res.json();
   ddVersion = versions[0];
   return ddVersion;
