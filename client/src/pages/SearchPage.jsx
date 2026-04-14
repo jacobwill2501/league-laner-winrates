@@ -65,7 +65,11 @@ export default function SearchPage() {
             ))}
           </select>
 
-          <button style={styles.button} type="submit" disabled={loading}>
+          <button
+            style={{ ...styles.button, opacity: loading ? 0.6 : 1, cursor: loading ? 'not-allowed' : 'pointer' }}
+            type="submit"
+            disabled={loading}
+          >
             {loading ? 'Searching...' : 'Search'}
           </button>
         </form>
