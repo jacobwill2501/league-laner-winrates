@@ -23,21 +23,22 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!state?.summoner) return;
-    loadPage(page);
-  }, [page]);
-
-  async function loadPage(p) {
-    setLoading(true);
-    setError('');
-    try {
-      const data = await fetchMatches(state.summoner.puuid, state.region, p);
-      setMatchData(data);
-    } catch (err) {
-      setError(err.message || 'Failed to load matches');
-    } finally {
-      setLoading(false);
+    let cancelled = false;
+    async function run() {
+      setLoading(true);
+      setError('');
+      try {
+        const data = await fetchMatches(state.summoner.puuid, state.region, page);
+        if (!cancelled) setMatchData(data);
+      } catch (err) {
+        if (!cancelled) setError(err.message || 'Failed to load matches');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
     }
-  }
+    run();
+    return () => { cancelled = true; };
+  }, [page, state]);
 
   if (!state?.summoner) return null;
 
