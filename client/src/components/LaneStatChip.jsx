@@ -1,6 +1,7 @@
 const LANE_LABELS = { top: 'Top', mid: 'Mid', bot: 'Bot+Sup' };
 
 export default function LaneStatChip({ lane, stats }) {
+  if (!stats) return null;
   const winPct = Math.round(stats.winRate * 100);
   const gdSign = stats.avgGD >= 0 ? '+' : '';
   const color = stats.winRate > 0.52 ? 'var(--win)' : stats.winRate < 0.45 ? 'var(--loss)' : 'var(--text)';
