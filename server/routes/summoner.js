@@ -50,7 +50,7 @@ router.get('/', async (req, res) => {
   } catch (err) {
     console.error('Summoner route error:', err.message);
     const msg = err.message || '';
-    const errorMessage = msg.includes('Riot API 401:')
+    const errorMessage = msg.includes('Riot API 401:') || msg.includes('Riot API 403:')
       ? 'API key is invalid or expired — regenerate it at developer.riotgames.com'
       : msg.includes('Riot API 429:')
       ? 'Rate limited by Riot API — try again in a moment'
