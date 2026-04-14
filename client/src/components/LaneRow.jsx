@@ -1,4 +1,4 @@
-import { RESULT_COLOR, RESULT_LABEL } from '../constants';
+import { RESULT_COLOR } from '../constants';
 
 const LANE_LABELS = { top: 'Top', mid: 'Mid', bot: 'Bot+Sup' };
 
@@ -28,7 +28,7 @@ export default function LaneRow({ lane, stats }) {
           border: `1px solid ${resultColor}55`,
         }}
       >
-        {RESULT_LABEL[stats.result]}
+        {stats.result}
       </span>
 
       <div style={styles.primaryGD}>
