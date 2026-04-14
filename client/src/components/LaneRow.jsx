@@ -10,6 +10,7 @@ function formatTime(seconds) {
 }
 
 function gdLabel(gd) {
+  if (gd == null) return '—';
   return `${gd >= 0 ? '+' : ''}${gd}g`;
 }
 
@@ -51,7 +52,7 @@ export default function LaneRow({ lane, stats }) {
 
       <div style={styles.kda}>
         <span style={styles.label}>KDA</span>
-        <span>{stats.kda.toFixed(2)}</span>
+        <span>{stats.kda != null ? Number(stats.kda).toFixed(2) : '—'}</span>
       </div>
     </div>
   );
