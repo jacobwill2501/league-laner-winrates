@@ -20,6 +20,9 @@ const REGIONS = {
 };
 
 const RIOT_API_KEY = process.env.RIOT_API_KEY || '';
+if (!RIOT_API_KEY) {
+  console.warn('WARNING: RIOT_API_KEY is not set — all Riot API calls will fail with 401');
+}
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || 'http://localhost:5173';
 const PORT = parseInt(process.env.PORT || '3001', 10);
 

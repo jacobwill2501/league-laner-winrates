@@ -47,6 +47,7 @@ router.get('/', async (req, res) => {
     const jungleMatches = [];
     const ddVersion = await getDdVersion();
 
+    let brokeEarly = false;
     for (const matchId of allIds) {
       let cached = getCachedMatch(db, matchId);
 
@@ -84,12 +85,15 @@ router.get('/', async (req, res) => {
         lanes: laneStats,
       });
 
-      if (jungleMatches.length >= pageNum * PAGE_SIZE) break;
+      if (jungleMatches.length >= pageNum * PAGE_SIZE) {
+        brokeEarly = true;
+        break;
+      }
     }
 
     const totalJungleFound = jungleMatches.length;
     const pageMatches = jungleMatches.slice((pageNum - 1) * PAGE_SIZE, pageNum * PAGE_SIZE);
-    const hasMore = totalJungleFound === pageNum * PAGE_SIZE;
+    const hasMore = brokeEarly;
 
     const aggregates = computeAggregates(jungleMatches);
 
