@@ -6,6 +6,7 @@ function sleep(ms) {
 
 async function riotGet(url) {
   await sleep(REQUEST_DELAY_MS);
+  console.log(`Riot API request: ${url}`);
   const res = await fetch(url, {
     headers: { 'X-Riot-Token': RIOT_API_KEY },
   });
