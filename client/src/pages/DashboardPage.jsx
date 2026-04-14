@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { fetchMatches } from '../api';
 import SummonerCard from '../components/SummonerCard';
 import MatchCard from '../components/MatchCard';
+import HelpModal from '../components/HelpModal';
 
 export default function DashboardPage() {
   const { state } = useLocation();
@@ -14,6 +15,7 @@ export default function DashboardPage() {
   const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [showHelp, setShowHelp] = useState(false);
 
   useEffect(() => {
     if (!state?.summoner) {
@@ -51,9 +53,15 @@ export default function DashboardPage() {
   return (
     <div style={styles.page}>
       <div style={styles.container}>
-        <button style={styles.back} onClick={() => navigate('/')}>
-          ← New Search
-        </button>
+        <div style={styles.topBar}>
+          <button style={styles.back} onClick={() => navigate('/')}>
+            ← New Search
+          </button>
+          <button style={styles.helpBtn} onClick={() => setShowHelp(true)}>
+            ? How stats work
+          </button>
+        </div>
+        {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
 
         <SummonerCard
           summoner={state.summoner}
@@ -110,6 +118,12 @@ const styles = {
     maxWidth: '900px',
     margin: '0 auto',
   },
+  topBar: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '1.25rem',
+  },
   back: {
     background: 'none',
     border: '1px solid var(--border)',
@@ -117,7 +131,16 @@ const styles = {
     color: 'var(--text-muted)',
     padding: '0.4rem 0.9rem',
     fontSize: '0.85rem',
-    marginBottom: '1.25rem',
+    cursor: 'pointer',
+  },
+  helpBtn: {
+    background: 'none',
+    border: '1px solid var(--border)',
+    borderRadius: 'var(--radius)',
+    color: 'var(--text-muted)',
+    padding: '0.4rem 0.9rem',
+    fontSize: '0.85rem',
+    cursor: 'pointer',
   },
   loading: {
     textAlign: 'center',
