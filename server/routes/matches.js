@@ -31,7 +31,10 @@ router.get('/', async (req, res) => {
       do {
         batch = await getMatchIds(puuid, regionKey, start, 100);
         if (batch && batch.length > 0) {
-          storeMatchIds(db, puuid, batch, batch.map(() => 0));
+          // Use negative position as timestamp so ORDER BY game_ts DESC returns
+          // matches in the same newest-first order Riot returns them
+          const timestamps = batch.map((_, i) => -(start + i));
+          storeMatchIds(db, puuid, batch, timestamps);
           allIds = [...allIds, ...batch];
           start += batch.length;
         }
