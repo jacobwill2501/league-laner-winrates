@@ -120,19 +120,21 @@ router.get('/', async (req, res) => {
 
 function computeAggregates(jungleMatches) {
   if (jungleMatches.length === 0) {
-    const empty = { winRate: 0, avgGD: 0, avgGD10: 0, avgGD15: 0, avgKDA: 0 };
+    const empty = { winRate: 0, winOrEvenRate: 0, avgGD: 0, avgGD10: 0, avgGD15: 0, avgKDA: 0 };
     return { top: empty, mid: empty, bot: empty };
   }
 
   function laneAgg(lane) {
     const n = jungleMatches.length;
     const wins = jungleMatches.filter((m) => m.lanes[lane].result === 'W').length;
+    const winOrEven = jungleMatches.filter((m) => m.lanes[lane].result !== 'L').length;
     const avgGD = jungleMatches.reduce((s, m) => s + m.lanes[lane].preInterventionGD, 0) / n;
     const avgGD10 = jungleMatches.reduce((s, m) => s + m.lanes[lane].gd10, 0) / n;
     const avgGD15 = jungleMatches.reduce((s, m) => s + m.lanes[lane].gd15, 0) / n;
     const avgKDA = jungleMatches.reduce((s, m) => s + m.lanes[lane].kda, 0) / n;
     return {
       winRate: parseFloat((wins / n).toFixed(3)),
+      winOrEvenRate: parseFloat((winOrEven / n).toFixed(3)),
       avgGD: Math.round(avgGD),
       avgGD10: Math.round(avgGD10),
       avgGD15: Math.round(avgGD15),
