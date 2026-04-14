@@ -3,18 +3,18 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { fetchMatches } from '../api';
 import SummonerCard from '../components/SummonerCard';
 import MatchCard from '../components/MatchCard';
-import Pagination from '../components/Pagination';
 
 export default function DashboardPage() {
   const { state } = useLocation();
   const navigate = useNavigate();
 
   const [page, setPage] = useState(1);
-  const [matchData, setMatchData] = useState(null);
+  const [allMatches, setAllMatches] = useState([]);
+  const [aggregates, setAggregates] = useState(null);
+  const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Redirect to search if navigated directly without summoner state
   useEffect(() => {
     if (!state?.summoner) {
       navigate('/', { replace: true });
@@ -29,7 +29,11 @@ export default function DashboardPage() {
       setError('');
       try {
         const data = await fetchMatches(state.summoner.puuid, state.region, page);
-        if (!cancelled) setMatchData(data);
+        if (!cancelled) {
+          setAllMatches((prev) => page === 1 ? data.matches : [...prev, ...data.matches]);
+          setAggregates(data.aggregates);
+          setHasMore(data.pagination.hasMore);
+        }
       } catch (err) {
         if (!cancelled) setError(err.message || 'Failed to load matches');
       } finally {
@@ -42,43 +46,55 @@ export default function DashboardPage() {
 
   if (!state?.summoner) return null;
 
+  const isFirstLoad = loading && allMatches.length === 0;
+
   return (
     <div style={styles.page}>
       <div style={styles.container}>
-        {/* Back button */}
         <button style={styles.back} onClick={() => navigate('/')}>
           ← New Search
         </button>
 
-        {/* Summoner header */}
         <SummonerCard
           summoner={state.summoner}
-          aggregates={matchData?.aggregates}
+          aggregates={aggregates}
         />
 
-        {/* Match list */}
-        {loading && <div style={styles.loading}>Loading matches...</div>}
+        {isFirstLoad && <div style={styles.loading}>Loading matches...</div>}
 
         {error && <div style={styles.error}>{error}</div>}
 
-        {!loading && matchData && matchData.matches.length === 0 && (
+        {!isFirstLoad && allMatches.length === 0 && (
           <div style={styles.empty}>
             No jungle games found in recent match history.
           </div>
         )}
 
-        {!loading && matchData?.matches.map((match) => (
+        {allMatches.map((match) => (
           <MatchCard key={match.matchId} match={match} />
         ))}
 
-        {matchData && (
-          <Pagination
-            page={page}
-            hasMore={matchData.pagination.hasMore}
-            onPrev={() => setPage((p) => p - 1)}
-            onNext={() => setPage((p) => p + 1)}
-            loading={loading}
-          />
+        {loading && allMatches.length > 0 && (
+          <div style={styles.loadingMore}>Loading more matches...</div>
+        )}
+
+        {!loading && hasMore && (
+          <div style={styles.loadMoreWrap}>
+            <button style={styles.loadMore} onClick={() => setPage((p) => p + 1)}>
+              Load More
+            </button>
+            {aggregates && (
+              <span style={styles.counter}>
+                {allMatches.length} of {aggregates.totalIds} ranked matches analyzed
+              </span>
+            )}
+          </div>
+        )}
+
+        {!loading && !hasMore && allMatches.length > 0 && (
+          <div style={styles.allLoaded}>
+            All {allMatches.length} jungle games loaded
+          </div>
         )}
       </div>
     </div>
@@ -109,6 +125,12 @@ const styles = {
     padding: '3rem 0',
     fontSize: '0.95rem',
   },
+  loadingMore: {
+    textAlign: 'center',
+    color: 'var(--text-muted)',
+    padding: '1rem 0',
+    fontSize: '0.875rem',
+  },
   error: {
     textAlign: 'center',
     color: 'var(--loss)',
@@ -118,5 +140,33 @@ const styles = {
     textAlign: 'center',
     color: 'var(--text-muted)',
     padding: '3rem 0',
+  },
+  loadMoreWrap: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '0.6rem',
+    marginTop: '1.5rem',
+    paddingBottom: '2rem',
+  },
+  loadMore: {
+    background: 'var(--surface)',
+    border: '1px solid var(--gold)',
+    borderRadius: 'var(--radius)',
+    color: 'var(--gold)',
+    padding: '0.5rem 2rem',
+    fontSize: '0.875rem',
+    fontWeight: 600,
+    cursor: 'pointer',
+  },
+  counter: {
+    color: 'var(--text-muted)',
+    fontSize: '0.8rem',
+  },
+  allLoaded: {
+    textAlign: 'center',
+    color: 'var(--text-muted)',
+    fontSize: '0.8rem',
+    padding: '1.5rem 0 2rem',
   },
 };
