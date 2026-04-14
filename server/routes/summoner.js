@@ -49,7 +49,13 @@ router.get('/', async (req, res) => {
     });
   } catch (err) {
     console.error('Summoner route error:', err.message);
-    res.status(502).json({ error: 'Failed to fetch summoner data from Riot API' });
+    const msg = err.message || '';
+    const errorMessage = msg.includes('Riot API 401:')
+      ? 'API key is invalid or expired — regenerate it at developer.riotgames.com'
+      : msg.includes('Riot API 429:')
+      ? 'Rate limited by Riot API — try again in a moment'
+      : 'Failed to fetch summoner data from Riot API';
+    res.status(502).json({ error: errorMessage });
   }
 });
 

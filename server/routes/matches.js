@@ -108,7 +108,13 @@ router.get('/', async (req, res) => {
     });
   } catch (err) {
     console.error('Matches route error:', err.message);
-    res.status(502).json({ error: 'Failed to fetch match data' });
+    const msg = err.message || '';
+    const errorMessage = msg.includes('Riot API 401:')
+      ? 'API key is invalid or expired — regenerate it at developer.riotgames.com'
+      : msg.includes('Riot API 429:')
+      ? 'Rate limited by Riot API — try again in a moment'
+      : 'Failed to fetch match data';
+    res.status(502).json({ error: errorMessage });
   }
 });
 
