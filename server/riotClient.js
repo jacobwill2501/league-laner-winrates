@@ -32,10 +32,10 @@ async function getSummonerByPuuid(puuid, region) {
   return riotGet(url);
 }
 
-// League-v4: summonerId -> ranked entries
-async function getLeagueEntries(summonerId, region) {
+// League-v4: puuid -> ranked entries
+async function getLeagueEntries(puuid, region) {
   const { platform } = REGIONS[region];
-  const url = `https://${platform}.api.riotgames.com/lol/league/v4/entries/by-summoner/${summonerId}`;
+  const url = `https://${platform}.api.riotgames.com/lol/league/v4/entries/by-puuid/${puuid}`;
   return riotGet(url);
 }
 

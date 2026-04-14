@@ -26,7 +26,7 @@ router.get('/', async (req, res) => {
     ]);
     if (!summoner) return res.status(404).json({ error: 'Summoner profile not found' });
 
-    const leagueEntries = await getLeagueEntries(summoner.id, regionKey);
+    const leagueEntries = await getLeagueEntries(account.puuid, regionKey);
     const rankedSolo = Array.isArray(leagueEntries)
       ? leagueEntries.find((e) => e.queueType === 'RANKED_SOLO_5x5')
       : null;
