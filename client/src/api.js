@@ -14,5 +14,7 @@ export function fetchSummoner(gameName, tagLine, region) {
 }
 
 export function fetchMatches(puuid, region, page) {
-  return apiFetch(`/api/matches?puuid=${puuid}&region=${region}&page=${page}`);
+  return apiFetch(
+    `/api/matches?puuid=${encodeURIComponent(puuid)}&region=${encodeURIComponent(region)}&page=${encodeURIComponent(page)}`
+  );
 }
