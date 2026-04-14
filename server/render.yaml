@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: league-laner-winrates-server
+    runtime: node
+    buildCommand: npm install
+    startCommand: node index.js
+    rootDir: server
+    envVars:
+      - key: RIOT_API_KEY
+        sync: false
+      - key: CLIENT_ORIGIN
+        sync: false
+      - key: PORT
+        value: 10000
