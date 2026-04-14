@@ -51,7 +51,7 @@ function findFirstIntervention(frames, junglerIds, laneIds) {
   return null;
 }
 
-function computeLaneStats(frames, allyIds, enemyIds, junglerIds, allyParticipants, enemyParticipants) {
+function computeLaneStats(frames, allyIds, enemyIds, junglerIds, allyParticipants) {
   const laneIds = [...allyIds, ...enemyIds];
   const interventionTs = findFirstIntervention(frames, junglerIds, laneIds);
 
@@ -103,13 +103,18 @@ function computeMatchStats(participants, searchedId, frames) {
   const allyJungle = byPos('JUNGLE', allyTeamId);
   const enemyJungle = byPos('JUNGLE', enemyTeamId);
 
+  if (!frames || frames.length === 0) {
+    const empty = { preInterventionGD: 0, gd10: 0, gd15: 0, result: 'E', interventionTime: null, kda: 0 };
+    return { top: empty, mid: empty, bot: empty };
+  }
+
   const junglerIds = [...allyJungle, ...enemyJungle].map((p) => p.participantId);
   const ids = (arr) => arr.map((p) => p.participantId);
 
   return {
-    top: computeLaneStats(frames, ids(allyTop), ids(enemyTop), junglerIds, allyTop, enemyTop),
-    mid: computeLaneStats(frames, ids(allyMid), ids(enemyMid), junglerIds, allyMid, enemyMid),
-    bot: computeLaneStats(frames, ids(allyBot), ids(enemyBot), junglerIds, allyBot, enemyBot),
+    top: computeLaneStats(frames, ids(allyTop), ids(enemyTop), junglerIds, allyTop),
+    mid: computeLaneStats(frames, ids(allyMid), ids(enemyMid), junglerIds, allyMid),
+    bot: computeLaneStats(frames, ids(allyBot), ids(enemyBot), junglerIds, allyBot),
   };
 }
 

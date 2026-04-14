@@ -185,3 +185,38 @@ test('KDA: computed correctly per lane, death=0 uses 1 as denominator', () => {
   // bot: (3+0+6+4) / max(1, 1+2) = 13/3 ≈ 4.33
   expect(result.bot.kda).toBeCloseTo(13 / 3, 2);
 });
+
+test('jungler is victim → counts as intervention for the lane where the kill happened', () => {
+  const participants = makeParticipants();
+  const frames = [];
+  for (let min = 0; min <= 15; min++) {
+    const events = [];
+    if (min === 6) {
+      events.push({
+        type: 'CHAMPION_KILL',
+        timestamp: 390000, // 6:30
+        killerId: 3,        // ally mid laner kills
+        victimId: 7,        // enemy jungler is the victim
+        assistingParticipantIds: [],
+      });
+    }
+    frames.push(makeFrame(min * 60000, {
+      1: 1000, 2: 1000, 3: 500 + min * 150,
+      4: 1000, 5: 1000,
+      6: 1000, 7: 1000, 8: 500 + min * 100,
+      9: 1000, 10: 1000,
+    }, events));
+  }
+
+  const result = computeMatchStats(participants, 2, frames);
+
+  // Mid: jungler (7) is victim, mid laner (3) is killer → intervention at 390000ms
+  // Last frame before 390000ms = frame at 6min (360000ms)
+  // ally mid = 500+900=1400, enemy mid = 500+600=1100 → GD=+300 → E (not > 300)
+  expect(result.mid.interventionTime).toBe(390);
+  expect(result.mid.preInterventionGD).toBe(300);
+  expect(result.mid.result).toBe('E');
+
+  // Top: no jungler intervention → uses GD@15
+  expect(result.top.interventionTime).toBeNull();
+});
