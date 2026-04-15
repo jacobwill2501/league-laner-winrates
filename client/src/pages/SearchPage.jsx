@@ -5,9 +5,18 @@ import { fetchSummoner } from '../api';
 
 const clusters = [...new Set(REGIONS.map((r) => r.cluster))];
 
+const ROLES = [
+  { value: 'top', label: 'Top' },
+  { value: 'jungle', label: 'Jungle' },
+  { value: 'mid', label: 'Mid' },
+  { value: 'bot', label: 'Bot' },
+  { value: 'support', label: 'Support' },
+];
+
 export default function SearchPage() {
   const [input, setInput] = useState('');
   const [region, setRegion] = useState('NA');
+  const [role, setRole] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -26,7 +35,7 @@ export default function SearchPage() {
     setLoading(true);
     try {
       const summoner = await fetchSummoner(gameName, tagLine, region);
-      navigate('/dashboard', { state: { summoner, region } });
+      navigate('/dashboard', { state: { summoner, region, role } });
     } catch (err) {
       setError(err.message || 'Summoner not found');
     } finally {
@@ -34,11 +43,13 @@ export default function SearchPage() {
     }
   }
 
+  const canSearch = !loading && !!role;
+
   return (
     <div style={styles.page}>
       <div style={styles.card}>
-        <h1 style={styles.title}>Jungle Lane Stats</h1>
-        <p style={styles.subtitle}>See how your lanes perform before you arrive</p>
+        <h1 style={styles.title}>Lane Stats</h1>
+        <p style={styles.subtitle}>See how lanes perform in your ranked games</p>
 
         <form onSubmit={handleSearch} style={styles.form}>
           <input
@@ -65,10 +76,27 @@ export default function SearchPage() {
             ))}
           </select>
 
+          <div style={styles.roleRow}>
+            {ROLES.map((r) => (
+              <button
+                key={r.value}
+                type="button"
+                style={{
+                  ...styles.roleBtn,
+                  ...(role === r.value ? styles.roleBtnActive : {}),
+                }}
+                onClick={() => setRole(r.value)}
+                disabled={loading}
+              >
+                {r.label}
+              </button>
+            ))}
+          </div>
+
           <button
-            style={{ ...styles.button, opacity: loading ? 0.6 : 1, cursor: loading ? 'not-allowed' : 'pointer' }}
+            style={{ ...styles.button, opacity: canSearch ? 1 : 0.4, cursor: canSearch ? 'pointer' : 'not-allowed' }}
             type="submit"
-            disabled={loading}
+            disabled={!canSearch}
           >
             {loading ? 'Searching...' : 'Search'}
           </button>
@@ -143,6 +171,29 @@ const styles = {
     fontSize: '1rem',
     fontWeight: 600,
     marginTop: '0.25rem',
+  },
+  roleRow: {
+    display: 'flex',
+    gap: '0.5rem',
+    flexWrap: 'wrap',
+  },
+  roleBtn: {
+    flex: 1,
+    minWidth: '60px',
+    background: 'var(--surface-2)',
+    border: '1px solid var(--border)',
+    borderRadius: 'var(--radius)',
+    color: 'var(--text-muted)',
+    padding: '0.5rem 0.25rem',
+    fontSize: '0.85rem',
+    fontWeight: 500,
+    cursor: 'pointer',
+  },
+  roleBtnActive: {
+    background: 'var(--gold)22',
+    border: '1px solid var(--gold)',
+    color: 'var(--gold)',
+    fontWeight: 700,
   },
   error: {
     color: 'var(--loss)',

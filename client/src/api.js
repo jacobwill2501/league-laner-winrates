@@ -13,8 +13,8 @@ export function fetchSummoner(gameName, tagLine, region) {
   );
 }
 
-export function fetchMatches(puuid, region, page) {
+export function fetchMatches(puuid, region, page, role) {
   return apiFetch(
-    `/api/matches?puuid=${encodeURIComponent(puuid)}&region=${encodeURIComponent(region)}&page=${encodeURIComponent(page)}`
+    `/api/matches?puuid=${encodeURIComponent(puuid)}&region=${encodeURIComponent(region)}&page=${encodeURIComponent(page)}&role=${encodeURIComponent(role)}`
   );
 }

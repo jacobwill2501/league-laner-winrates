@@ -1,6 +1,6 @@
 const LANE_LABELS = { top: 'Top', mid: 'Mid', bot: 'Bot+Sup' };
 
-export default function LaneStatChip({ lane, stats }) {
+export default function LaneStatChip({ lane, stats, role }) {
   if (!stats) return null;
   const winPct = Math.round(stats.winRate * 100);
   const winOrEvenPct = Math.round((stats.winOrEvenRate ?? 0) * 100);
@@ -25,7 +25,7 @@ export default function LaneStatChip({ lane, stats }) {
         </span>
       </div>
       <div style={styles.stat}>
-        <span style={styles.statLabel} title="Avg gold difference at time of first jungler intervention (or @15 if no gank)">Avg GD</span>
+        <span style={styles.statLabel} title={role === 'jungle' ? 'Avg gold difference at time of first jungler intervention (or @15 if no gank)' : 'Avg gold difference at 15 minutes'}>Avg GD</span>
         <span style={{ color: stats.avgGD >= 0 ? 'var(--win)' : 'var(--loss)' }}>
           {gdSign}{stats.avgGD}g
         </span>

@@ -14,8 +14,9 @@ function gdLabel(gd) {
   return `${gd >= 0 ? '+' : ''}${gd}g`;
 }
 
-export default function LaneRow({ lane, stats }) {
+export default function LaneRow({ lane, stats, role }) {
   const resultColor = RESULT_COLOR[stats.result];
+  const isJungle = role === 'jungle';
 
   return (
     <div style={styles.row}>
@@ -36,7 +37,9 @@ export default function LaneRow({ lane, stats }) {
         <span style={{ color: stats.preInterventionGD >= 0 ? 'var(--win)' : 'var(--loss)' }}>
           {gdLabel(stats.preInterventionGD)}
         </span>
-        <span style={styles.gankTime}>{formatTime(stats.interventionTime)}</span>
+        {isJungle && (
+          <span style={styles.gankTime}>{formatTime(stats.interventionTime)}</span>
+        )}
       </div>
 
       <div style={styles.secondary}>

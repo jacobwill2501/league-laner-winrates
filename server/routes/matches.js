@@ -8,13 +8,25 @@ const router = Router();
 
 const PAGE_SIZE = 10;
 
+const ROLE_MAP = {
+  top: 'TOP',
+  jungle: 'JUNGLE',
+  mid: 'MIDDLE',
+  bot: 'BOTTOM',
+  support: 'UTILITY',
+};
+
 router.get('/', async (req, res) => {
-  const { puuid, region, page = '1' } = req.query;
+  const { puuid, region, page = '1', role } = req.query;
   if (!puuid || !region) {
     return res.status(400).json({ error: 'puuid and region are required' });
   }
   if (!REGIONS[region.toUpperCase()]) {
     return res.status(400).json({ error: `Unknown region: ${region}` });
+  }
+  const teamPosition = ROLE_MAP[role];
+  if (!teamPosition) {
+    return res.status(400).json({ error: `Unknown role: ${role}. Must be one of: ${Object.keys(ROLE_MAP).join(', ')}` });
   }
 
   const regionKey = region.toUpperCase();
@@ -43,7 +55,7 @@ router.get('/', async (req, res) => {
 
     const totalIds = allIds.length;
 
-    // 2. Scan match details, filter to jungle games, collect up to pageNum*PAGE_SIZE
+    // 2. Scan match details, filter to role games, collect up to pageNum*PAGE_SIZE
     const jungleMatches = [];
     const ddVersion = await getDdVersion();
 
@@ -68,12 +80,12 @@ router.get('/', async (req, res) => {
       const searchedPlayer = participants.find((p) => p.puuid === puuid);
       if (!searchedPlayer) continue;
 
-      if (searchedPlayer.teamPosition !== 'JUNGLE') continue;
+      if (searchedPlayer.teamPosition !== teamPosition) continue;
 
       const frames = timelineData.info?.frames;
       if (!frames) continue;
 
-      const laneStats = computeMatchStats(participants, searchedPlayer.participantId, frames);
+      const laneStats = computeMatchStats(participants, searchedPlayer.participantId, frames, role);
 
       jungleMatches.push({
         matchId,

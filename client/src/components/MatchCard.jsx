@@ -17,7 +17,7 @@ function timeAgo(timestamp) {
   return `${Math.floor(days / 30)}mo ago`;
 }
 
-export default function MatchCard({ match }) {
+export default function MatchCard({ match, role }) {
   const borderColor = match.win ? 'var(--win)' : 'var(--loss)';
 
   return (
@@ -52,9 +52,9 @@ export default function MatchCard({ match }) {
 
       {/* Lane breakdown */}
       <div style={styles.lanes}>
-        <LaneRow lane="top" stats={match.lanes.top} />
-        <LaneRow lane="mid" stats={match.lanes.mid} />
-        <LaneRow lane="bot" stats={match.lanes.bot} />
+        <LaneRow lane="top" stats={match.lanes.top} role={role} />
+        <LaneRow lane="mid" stats={match.lanes.mid} role={role} />
+        <LaneRow lane="bot" stats={match.lanes.bot} role={role} />
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import LaneStatChip from './LaneStatChip';
 
-export default function SummonerCard({ summoner, aggregates }) {
+export default function SummonerCard({ summoner, aggregates, role }) {
   return (
     <div style={styles.card}>
       <div style={styles.left}>
@@ -39,9 +39,9 @@ export default function SummonerCard({ summoner, aggregates }) {
               </span>
             </div>
             <div style={styles.chips}>
-              <LaneStatChip lane="top" stats={aggregates.top} />
-              <LaneStatChip lane="mid" stats={aggregates.mid} />
-              <LaneStatChip lane="bot" stats={aggregates.bot} />
+              <LaneStatChip lane="top" stats={aggregates.top} role={role} />
+              <LaneStatChip lane="mid" stats={aggregates.mid} role={role} />
+              <LaneStatChip lane="bot" stats={aggregates.bot} role={role} />
             </div>
           </>
         )}

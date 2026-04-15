@@ -85,7 +85,7 @@ function computeLaneStats(frames, allyIds, enemyIds, junglerIds, allyParticipant
   return { preInterventionGD, gd10, gd15, result, interventionTime: interventionTimeSec, kda };
 }
 
-function computeMatchStats(participants, searchedId, frames) {
+function computeMatchStats(participants, searchedId, frames, role) {
   const searched = participants.find((p) => p.participantId === searchedId);
   const allyTeamId = searched.teamId;
   const enemyTeamId = allyTeamId === 100 ? 200 : 100;
@@ -108,7 +108,11 @@ function computeMatchStats(participants, searchedId, frames) {
     return { top: empty, mid: empty, bot: empty };
   }
 
-  const junglerIds = [...allyJungle, ...enemyJungle].map((p) => p.participantId);
+  // For non-jungle roles, pass empty junglerIds so intervention detection is skipped
+  // and GD@15 is used as the primary metric for all lanes.
+  const junglerIds = role === 'jungle'
+    ? [...allyJungle, ...enemyJungle].map((p) => p.participantId)
+    : [];
   const ids = (arr) => arr.map((p) => p.participantId);
 
   return {

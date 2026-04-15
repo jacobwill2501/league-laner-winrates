@@ -30,7 +30,7 @@ export default function DashboardPage() {
       setLoading(true);
       setError('');
       try {
-        const data = await fetchMatches(state.summoner.puuid, state.region, page);
+        const data = await fetchMatches(state.summoner.puuid, state.region, page, state.role);
         if (!cancelled) {
           setAllMatches((prev) => page === 1 ? data.matches : [...prev, ...data.matches]);
           setAggregates(data.aggregates);
@@ -61,11 +61,12 @@ export default function DashboardPage() {
             ? How stats work
           </button>
         </div>
-        {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
+        {showHelp && <HelpModal onClose={() => setShowHelp(false)} role={state.role} />}
 
         <SummonerCard
           summoner={state.summoner}
           aggregates={aggregates}
+          role={state.role}
         />
 
         {isFirstLoad && <div style={styles.loading}>Loading matches...</div>}
@@ -74,12 +75,12 @@ export default function DashboardPage() {
 
         {!isFirstLoad && allMatches.length === 0 && (
           <div style={styles.empty}>
-            No jungle games found in recent match history.
+            No {state.role} games found in recent match history.
           </div>
         )}
 
         {allMatches.map((match) => (
-          <MatchCard key={match.matchId} match={match} />
+          <MatchCard key={match.matchId} match={match} role={state.role} />
         ))}
 
         {loading && allMatches.length > 0 && (
@@ -101,7 +102,7 @@ export default function DashboardPage() {
 
         {!loading && !hasMore && allMatches.length > 0 && (
           <div style={styles.allLoaded}>
-            All {allMatches.length} jungle games loaded
+            All {allMatches.length} {state.role} games loaded
           </div>
         )}
       </div>

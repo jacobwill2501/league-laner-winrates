@@ -1,4 +1,6 @@
-export default function HelpModal({ onClose }) {
+export default function HelpModal({ onClose, role }) {
+  const isJungle = role === 'jungle';
+
   return (
     <div style={styles.overlay} onClick={onClose}>
       <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
@@ -12,12 +14,20 @@ export default function HelpModal({ onClose }) {
           {/* Lane Result */}
           <section style={styles.section}>
             <div style={styles.sectionTitle}>Lane Result (W / E / L)</div>
-            <p style={styles.text}>
-              Each lane is scored based on <strong>gold difference at the moment a jungler first gets involved</strong> — defined as the first kill, death, or assist where a jungler and a laner from that lane are both part of the event.
-            </p>
-            <p style={styles.text}>
-              If no jungler gets involved in a lane, <strong>GD@15</strong> is used as the snapshot instead.
-            </p>
+            {isJungle ? (
+              <>
+                <p style={styles.text}>
+                  Each lane is scored based on <strong>gold difference at the moment a jungler first gets involved</strong> — defined as the first kill, death, or assist where a jungler and a laner from that lane are both part of the event.
+                </p>
+                <p style={styles.text}>
+                  If no jungler gets involved in a lane, <strong>GD@15</strong> is used as the snapshot instead.
+                </p>
+              </>
+            ) : (
+              <p style={styles.text}>
+                Each lane is scored based on <strong>gold difference at 15 minutes (GD@15)</strong> — the standard end-of-laning-phase snapshot.
+              </p>
+            )}
             <div style={styles.thresholdRow}>
               <span style={{ ...styles.chip, background: '#22c55e22', color: '#22c55e', border: '1px solid #22c55e55' }}>W</span>
               <span style={styles.thresholdLabel}>GD &gt; <strong>+300g</strong> — lane ahead at intervention</span>
@@ -36,7 +46,7 @@ export default function HelpModal({ onClose }) {
           <section style={styles.section}>
             <div style={styles.sectionTitle}>Lane Stat Chips (Top / Mid / Bot+Sup)</div>
             <p style={styles.text}>
-              These aggregate across all jungle games analyzed so far and update as you load more.
+              These aggregate across all {isJungle ? 'jungle' : role} games analyzed so far and update as you load more.
             </p>
 
             {/* Example chip */}
@@ -55,15 +65,15 @@ export default function HelpModal({ onClose }) {
             <div style={styles.legendList}>
               <div style={styles.legendRow}>
                 <span style={{ ...styles.legendSwatch, color: '#22c55e', fontWeight: 700, fontSize: '1rem' }}>54%</span>
-                <span style={styles.legendText}><strong>Win rate</strong> — % of lanes scored W (GD &gt; +300 at intervention)</span>
+                <span style={styles.legendText}><strong>Win rate</strong> — % of lanes scored W (GD &gt; +300{isJungle ? ' at intervention' : ' at 15 min'})</span>
               </div>
               <div style={styles.legendRow}>
                 <span style={{ ...styles.legendSwatch, color: '#86efac', fontWeight: 600 }}>71%</span>
-                <span style={styles.legendText}><strong>Win or even rate</strong> — % of lanes not lost (GD &gt; −300 at intervention). Pastel green.</span>
+                <span style={styles.legendText}><strong>Win or even rate</strong> — % of lanes not lost (GD &gt; −300{isJungle ? ' at intervention' : ' at 15 min'}). Pastel green.</span>
               </div>
               <div style={styles.legendRow}>
                 <span style={styles.legendSwatch}>Avg GD</span>
-                <span style={styles.legendText}>Average gold difference at intervention (or @15 if no gank)</span>
+                <span style={styles.legendText}>{isJungle ? 'Average gold difference at intervention (or @15 if no gank)' : 'Average gold difference at 15 minutes'}</span>
               </div>
               <div style={styles.legendRow}>
                 <span style={styles.legendSwatch}>KDA</span>
@@ -87,7 +97,7 @@ export default function HelpModal({ onClose }) {
               <span style={styles.exampleLaneTag}>Top</span>
               <span style={{ ...styles.chip, background: '#22c55e22', color: '#22c55e', border: '1px solid #22c55e55', marginRight: 8 }}>W</span>
               <span style={{ color: '#22c55e', fontWeight: 600, marginRight: 8 }}>+420g</span>
-              <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginRight: 16 }}>8:00</span>
+              {isJungle && <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginRight: 16 }}>8:00</span>}
               <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>@10 <span style={{ color: '#22c55e' }}>+200g</span></span>
               <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginLeft: 8 }}>@15 <span style={{ color: '#22c55e' }}>+380g</span></span>
               <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginLeft: 'auto' }}>KDA 2.50</span>
@@ -95,12 +105,14 @@ export default function HelpModal({ onClose }) {
             <div style={styles.legendList}>
               <div style={styles.legendRow}>
                 <span style={styles.legendSwatch}>+420g</span>
-                <span style={styles.legendText}>Gold difference at intervention time (green = ahead, red = behind)</span>
+                <span style={styles.legendText}>{isJungle ? 'Gold difference at intervention time' : 'Gold difference at 15 minutes'} (green = ahead, red = behind)</span>
               </div>
-              <div style={styles.legendRow}>
-                <span style={styles.legendSwatch}>8:00</span>
-                <span style={styles.legendText}>Timestamp of first jungler involvement. "No gank" if jungler never touched this lane.</span>
-              </div>
+              {isJungle && (
+                <div style={styles.legendRow}>
+                  <span style={styles.legendSwatch}>8:00</span>
+                  <span style={styles.legendText}>Timestamp of first jungler involvement. "No gank" if jungler never touched this lane.</span>
+                </div>
+              )}
             </div>
           </section>
 
